@@ -318,125 +318,42 @@
     </div>
 
     <script>
-        // 大幅扩充的谜底词库
+        // 精简后的基础词汇库，去除了生僻词，保留了最常见的单词作为谜底
         const WORD_LIST = [
-            "APPLE", "BRICK", "CRANE", "DANCE", "EAGLE", "FLAME", "GRAPE", "HOUSE", "IMAGE", "JUICE",
-            "KNIFE", "LEMON", "MOUSE", "NIGHT", "OCEAN", "PEARL", "QUEEN", "RIVER", "SNAKE", "TRAIN",
-            "UNCLE", "VOICE", "WATER", "YOUTH", "ZEBRA", "GHOST", "BLADE", "STORM", "PLANT", "HEART",
-            "LIGHT", "MUSIC", "WORLD", "TIGER", "BEACH", "CHAIR", "CLOCK", "BREAD", "SMILE", "SUGAR",
-            "REACT", "NOVEL", "MONEY", "VITAL", "SHAPE", "DREAM", "BRAVE", "MAGIC", "POWER", "SPACE",
-            "TOWER", "STONE", "FRUIT", "PIZZA", "PAINT", "GLASS", "BLOOD", "BROWN", "BLACK", "WHITE",
-            "GREEN", "SWEET", "TRUCK", "MOUTH", "TOOTH", "SHIRT", "PANTS", "SHOES", "WATCH", "SMART",
-            "HELLO", "THERE", "WHERE", "WHICH", "THEIR", "ABOUT", "WOULD", "COULD", "RIGHT", "THINK",
-            "ABYSS", "AGAPE", "ALOOF", "AMISS", "ASKEW", "AWARE", "AWFUL", "AZURE", "BADGE", "BAKER", 
-            "BATHE", "BEZEL", "BLUFF", "BOULE", "BRAWL", "CACAO", "CATCH", "CAULK", "CHAFE", "CHASM", 
-            "COACH", "CRUMB", "CYNIC", "DECAL", "DIRGE", "DODGE", "DOWEL", "DWARF", "ECLAT", "ENNUI", 
-            "EPOCH", "FACET", "FEIGN", "FJORD", "FLAIL", "FLOCK", "FORGO", "GAFFE", "GLYPH", "GOUGE", 
-            "GRAZE", "GUILD", "HAUTE", "HEIST", "HOUND", "HUTCH", "IGLOO", "INERT", "IRATE", "IVORY", 
-            "JAUNT", "JAZZY", "JERKY", "JUMBO", "KAYAK", "KAZOO", "KNEAD", "KNOCK", "LAPEL", "LEMUR", 
-            "LILAC", "LUMEN", "MACAW", "MADAM", "MAUVE", "MIDGE", "MINCE", "MOCHA", "MOUND", "MUDDY", 
-            "NADIR", "NYMPH", "OASIS", "OBESE", "OCCUR", "ONION", "OVOID", "PIQUE", "PLUMB", "PROXY", 
-            "PULPY", "QUACK", "QUAIL", "QUASH", "QUIRK", "REBUT", "RHINO", "ROUGE", "RUPEE", "SALVO", 
-            "SAVOY", "SHIRK", "SHRUB", "SKULK", "SLAIN", "SLOSH", "SNOUT", "SQUID", "SWIRL", "SYNTH", 
-            "TAFFY", "TOPAZ", "TRACT", "TWANG", "UNCUT", "USURP", "UVULA", "VIGIL", "VOUCH", "WALTZ", 
-            "WHACK", "WHORL", "WIDOW", "WRUNG", "XENON", "YACHT", "YIELD", "ZESTY", "ALOUD", "AMBER", 
-            "ANGRY", "ARGUED", "AUDIO", "AWAKE", "BACON", "BASIC", "BEAST", "BEGIN", "BERRY", "BINGE", 
-            "BLEND", "BLOCK", "BLOOM", "BOARD", "BOAST", "BRAIN", "BRAND", "BRAVO", "BROTH", "CABLE", 
-            "CACHE", "CAMEL", "CANDY", "CARGO", "CAROL", "CEDAR", "CELLO", "CHAMP", "CHART", "CHASE", 
-            "CHIEF", "CHILD", "CHILL", "CHOIR", "CHOKE", "CHUCK", "CLAIM", "CLASH", "CLEAN", "CLEAR", 
-            "CLIMB", "CLOAK", "CLONE", "CLOSE", "CLOUD", "CRAFT", "CRAMP", "CRASH", "CRAZY", "CREAM", 
-            "CROWD", "CROWN", "CRUST", "CURVE", "DAILY", "DAISY", "DELAY", "DELTA", "DEPTH", "DEVIL", 
-            "DIARY", "DITCH", "DONUT", "DOUBT", "DOUGH", "DRAFT", "DRAMA", "DRAWN", "DRIFT", "DRINK", 
-            "DRIVE", "EARLY", "EARTH", "EIGHT", "ELITE", "EMPTY", "ENEMY", "ENJOY", "ENTER", "EQUAL", 
-            "ERROR", "EVENT", "EXACT", "EXIST", "EXTRA", "FAITH", "FALSE", "FAULT", "FAVOR", "FEAST", 
-            "FIELD", "FIFTH", "FIFTY", "FIGHT", "FINAL", "FIRST", "FLASH", "FLEET", "FLOAT", "FLOOR", 
-            "FLORA", "FLUID", "FOCUS", "FORCE", "FORGE", "FORTH", "FORTY", "FORUM", "FOUND", "FRAME", 
-            "FRANK", "FRAUD", "FRESH", "FRONT", "FROST", "FUNNY", "GIANT", "GIVEN", "GLOBE", "GLORY", 
-            "GOOSE", "GRACE", "GRAND", "GRANT", "GRASS", "GREAT", "GRIEF", "GRILL", "GROUP", "GUARD", 
-            "GUEST", "GUIDE", "HABIT", "HAPPY", "HARSH", "HATCH", "HAVEN", "HEAVY", "HENCE", "HONEY", 
-            "HORSE", "HOTEL", "HUMAN", "HURRY", "IDEAL", "IDIOT", "INDEX", "INNER", "INPUT", "ISSUE", 
-            "JOINT", "JUDGE", "LABEL", "LABOR", "LARGE", "LASER", "LATER", "LAUGH", "LAYER", "LEARN", 
-            "LEASE", "LEAST", "LEAVE", "LEGAL", "LEVEL", "LIMIT", "LINKS", "LIVER", "LOCAL", "LOGIC", 
-            "LOOSE", "LOVER", "LOWER", "LOYAL", "LUCKY", "LUNCH", "MAJOR", "MAKER", "MANGO", "MARCH", 
-            "MATCH", "MAYOR", "MEANT", "MEDIA", "MERIT", "METAL", "METER", "MICRO", "MINOR", "MINUS", 
-            "MODEL", "MONTH", "MORAL", "MOTOR", "MOUNT", "NEVER", "NEWLY", "NOBLE", "NOISE", "NORTH", 
-            "NURSE", "OCCUR", "OFFER", "OFTEN", "ONION", "ORDER", "OTHER", "OUGHT", "OUNCE", "OUTER", 
-            "OWNER", "PANEL", "PAPER", "PARTY", "PEACE", "PHASE", "PHONE", "PHOTO", "PIECE", "PILOT", 
-            "PITCH", "PLACE", "PLAIN", "PLANE", "PLATE", "POINT", "POUND", "PRICE", "PRIDE", "PRIME", 
-            "PRINT", "PRIZE", "PROOF", "PROUD", "PROVE", "QUICK", "QUIET", "QUITE", "RADIO", "RAISE", 
-            "RANGE", "RAPID", "RATIO", "REACH", "READY", "RELAX", "REPLY", "RIDER", "RIGHT", "ROBOT", 
-            "ROMAN", "ROUGH", "ROUND", "ROUTE", "ROYAL", "RURAL", "SCALE", "SCENE", "SCOPE", "SCORE", 
-            "SENSE", "SERVE", "SEVEN", "SHALL", "SHARE", "SHEEP", "SHEET", "SHELF", "SHELL", "SHIFT", 
-            "SHOCK", "SHOOT", "SHORT", "SIGHT", "SKILL", "SLEEP", "SLIDE", "SMALL", "SMOKE", "SOLID", 
-            "SOLVE", "SOUND", "SOUTH", "SPEAK", "SPEED", "SPELL", "SPEND", "SPLIT", "SPOON", "SPORT", 
-            "STAFF", "STAGE", "STAND", "START", "STATE", "STEAM", "STEEL", "STICK", "STILL", "STOCK", 
-            "STORE", "STORY", "STUDY", "STUFF", "STYLE", "SUPER", "TABLE", "TASTE", "TEACH", "TEXAS", 
-            "THANK", "THEFT", "THEME", "THICK", "THING", "THIRD", "THOSE", "THREE", "THREW", "THROW", 
-            "TIGHT", "TITLE", "TODAY", "TOPIC", "TOTAL", "TOUCH", "TOUGH", "TRACK", "TRADE", "TREAT", 
-            "TREND", "TRIAL", "TRIBE", "TRICK", "TRUST", "TRUTH", "TWICE", "UNDER", "UNDUE", "UNION", 
-            "UNITY", "UNTIL", "UPPER", "UPSET", "URBAN", "USAGE", "USUAL", "VALID", "VALUE", "VIDEO", 
-            "VIRUS", "VISIT", "VISUAL", "VOCAL", "WAGON", "WASTE", "WEIGH", "WHEEL", "WHILE", "WHOLE", 
-            "WIDEN", "WOMAN", "WORRY", "WORSE", "WORST", "WORTH", "WOULD", "WOUND", "WRITE", "WRONG"
+            "APPLE", "WATER", "HOUSE", "MUSIC", "LIGHT", "BOARD", "CHAIR", "TABLE", "PHONE", "CLOCK",
+            "PAPER", "TRAIN", "PLANT", "EARTH", "WORLD", "HEART", "NIGHT", "BEACH", "RIVER", "BREAD",
+            "SMILE", "SUGAR", "MONEY", "DREAM", "POWER", "SPACE", "STONE", "FRUIT", "PIZZA", "PAINT",
+            "GLASS", "BROWN", "BLACK", "WHITE", "GREEN", "SWEET", "MOUTH", "TOOTH", "SHIRT", "SHOES",
+            "WATCH", "SMART", "HELLO", "ABOUT", "RIGHT", "THINK", "HAPPY", "GHOST", "STORM", "MAGIC",
+            "TOWER", "TRUCK", "MOUSE", "LEMON", "JUICE", "GRAPE", "DANCE", "VOICE", "YOUTH", "TIGER",
+            "BLOOD", "QUEEN", "UNCLE", "BEAST", "BRAIN", "BRAND", "BRAVE", "BREAK", "BRING", "BUILD",
+            "CARRY", "CATCH", "CAUSE", "CHAIN", "CHASE", "CHEAP", "CHECK", "CHEST", "CHIEF", "CHILD", 
+            "CHINA", "CLASS", "CLEAN", "CLEAR", "CLOSE", "COACH", "COAST", "COULD", "COUNT", "COURT", 
+            "COVER", "CRAFT", "CRASH", "CREAM", "CRIME", "CROSS", "CROWD", "CROWN", "DEATH", "DELAY", 
+            "DEPTH", "DOUBT", "DRAFT", "DRAMA", "DRESS", "DRINK", "DRIVE", "EARLY", "EIGHT", "EMPTY", 
+            "ENEMY", "ENJOY", "ENTER", "EQUAL", "ERROR", "EVENT", "EXACT", "EXIST", "EXTRA", "FAITH", 
+            "FALSE", "FAULT", "FIELD", "FIFTH", "FIFTY", "FIGHT", "FINAL", "FIRST", "FLASH", "FLOOR", 
+            "FOCUS", "FORCE", "FORTH", "FORTY", "FOUND", "FRAME", "FRESH", "FRONT", "FUNNY", "GIANT", 
+            "GLOBE", "GRACE", "GRAND", "GRANT", "GRASS", "GREAT", "GROUP", "GUARD", "GUESS", "GUEST", 
+            "GUIDE", "HEAVY", "HORSE", "HOTEL", "HUMAN", "IMAGE", "ISSUE", "JUDGE", "LARGE", "LAUGH", 
+            "LEARN", "LEAVE", "LEVEL", "LIMIT", "LOCAL", "LUCKY", "LUNCH", "MAJOR", "MATCH", "METAL", 
+            "MODEL", "MONTH", "MORAL", "MOTOR", "MOUNT", "MOVIE", "NEVER", "NOISE", "NORTH", "NURSE", 
+            "OCCUR", "OCEAN", "OFFER", "OFTEN", "ORDER", "OTHER", "OUGHT", "OWNER", "PARTY", "PEACE", 
+            "PHOTO", "PIECE", "PILOT", "PITCH", "PLACE", "PLAIN", "PLANE", "PLATE", "POINT", "POUND", 
+            "PRESS", "PRICE", "PRIDE", "PRIME", "PRINT", "PRIZE", "PROOF", "PROUD", "PROVE", "QUICK", 
+            "QUIET", "QUITE", "RADIO", "RAISE", "RANGE", "RAPID", "RATIO", "REACH", "READY", "ROUGH", 
+            "ROUND", "ROUTE", "ROYAL", "RURAL", "SCALE", "SCENE", "SCORE", "SENSE", "SERVE", "SEVEN", 
+            "SHALL", "SHAPE", "SHARE", "SHARP", "SHEET", "SHELF", "SHELL", "SHIFT", "SHOCK", "SHOOT", 
+            "SHORT", "SIGHT", "SKILL", "SLEEP", "SLIDE", "SMALL", "SMOKE", "SOLID", "SOLVE", "SORRY", 
+            "SOUND", "SOUTH", "SPEAK", "SPEED", "SPEND", "SPORT", "STAFF", "STAGE", "STAND", "START", 
+            "STATE", "STEAM", "STEEL", "STICK", "STILL", "STOCK", "STORE", "STORY", "STUDY", "STUFF", 
+            "STYLE", "SUPER", "TASTE", "TEACH", "TEETH", "THANK", "THEFT", "THEIR", "THEME", "THERE", 
+            "THESE", "THICK", "THING", "THIRD", "THOSE", "THREE", "THROW", "TIGHT", "TITLE", "TODAY", 
+            "TOPIC", "TOTAL", "TOUCH", "TOUGH", "TRACK", "TRADE", "TREAT", "TREND", "TRIAL", "TRUST", 
+            "TRUTH", "TWICE", "UNDER", "UNION", "UNTIL", "UPPER", "UPSET", "URBAN", "USUAL", "VALID", 
+            "VALUE", "VIDEO", "VIRUS", "VISIT", "WASTE", "WHEEL", "WHERE", "WHICH", "WHILE", "WHOLE", 
+            "WOMAN", "WORRY", "WORSE", "WORST", "WORTH", "WOULD", "WOUND", "WRITE", "WRONG"
         ];
-
-        // 扩充的有效猜测库（用于判断输入是否为合法英文单词）
-        const COMMON_VALID_GUESSES = [
-            "AAHED", "AALII", "AARGH", "ABACA", "ABACI", "ABACK", "ABAFT", "ABAKA", "ABAMP", "ABASE",
-            "ABASH", "ABATE", "ABAYA", "ABBAS", "ABBES", "ABBEY", "ABBOT", "ABEAM", "ABELE", "ABETS",
-            "ABHOR", "ABIDE", "ABLED", "ABLER", "ABLES", "ABORT", "ABOUT", "ABOVE", "ABUSE", "ACTED",
-            "ACTOR", "ACUTE", "ADAPT", "ADDED", "ADEPT", "ADMIN", "ADMIT", "ADOBE", "ADOPT", "ADORE",
-            "ADULT", "AFTER", "AGAIN", "AGENT", "AGING", "AGONY", "AGREE", "AHEAD", "ALARM", "ALBUM",
-            "ALERT", "ALIEN", "ALIVE", "ALLEY", "ALLOW", "ALONE", "ALONG", "ALTER", "AMONG", "ANGER",
-            "ANGLE", "ANGRY", "ANIMAL","ANNOY", "APART", "APPLE", "APPLY", "ARENA", "ARGUE", "ARISE",
-            "ARMED", "ARRAY", "ARROW", "ASSET", "AUDIO", "AUDIT", "AVOID", "AWAKE", "AWARD", "AWARE",
-            "BASED", "BASIC", "BASIS", "BEACH", "BEAST", "BEGIN", "BEING", "BELLY", "BELOW", "BENCH",
-            "BLAME", "BLIND", "BLOCK", "BLOOD", "BOARD", "BOOST", "BOOTH", "BOUND", "BRAIN", "BRAND",
-            "BREAD", "BREAK", "BREED", "BRIEF", "BRING", "BROAD", "BROKE", "BROWN", "BUILD", "BUILT",
-            "BUYER", "CABLE", "CALIF", "CARRY", "CATCH", "CAUSE", "CHAIN", "CHAIR", "CHART", "CHASE",
-            "CHEAP", "CHECK", "CHEST", "CHIEF", "CHILD", "CHINA", "CHOSE", "CIVIL", "CLAIM", "CLASS",
-            "CLEAN", "CLEAR", "CLICK", "CLOCK", "CLOSE", "COACH", "COAST", "COULD", "COUNT", "COURT",
-            "COVER", "CRAFT", "CRASH", "CREAM", "CRIME", "CROSS", "CROWD", "CROWN", "CURVE", "CYCLE",
-            "DAILY", "DANCE", "DATED", "DEALT", "DEATH", "DEBUT", "DELAY", "DEPTH", "DOING", "DOUBT",
-            "DOZEN", "DRAFT", "DRAMA", "DRAWN", "DREAM", "DRESS", "DRILL", "DRINK", "DRIVE", "DROVE",
-            "DYING", "EAGER", "EARLY", "EARTH", "EIGHT", "ELITE", "EMPTY", "ENEMY", "ENJOY", "ENTER",
-            "ENTRY", "EQUAL", "ERROR", "EVENT", "EXACT", "EXIST", "EXTRA", "FAITH", "FALSE", "FAULT",
-            "FIBER", "FIELD", "FIFTH", "FIFTY", "FIGHT", "FINAL", "FIRST", "FIXED", "FLASH", "FLEET",
-            "FLOOR", "FLUID", "FOCUS", "FORCE", "FORTH", "FORTY", "FORUM", "FOUND", "FRAME", "FRANK",
-            "FRAUD", "FRESH", "FRONT", "FRUIT", "FULLY", "FUNNY", "GIANT", "GIVEN", "GLASS", "GLOBE",
-            "GOING", "GRACE", "GRADE", "GRAND", "GRANT", "GRASS", "GREAT", "GREEN", "GROSS", "GROUP",
-            "GROWN", "GUARD", "GUESS", "GUEST", "GUIDE", "HAPPY", "HARRY", "HEART", "HEAVY", "HELLO",
-            "HORSE", "HOTEL", "HOUSE", "HUMAN", "IDEAL", "IMAGE", "INDEX", "INNER", "INPUT", "ISSUE",
-            "JAPAN", "JOINT", "JONES", "JUDGE", "KNOWN", "LABEL", "LARGE", "LASER", "LATER", "LAUGH",
-            "LAYER", "LEARN", "LEASE", "LEAST", "LEAVE", "LEGAL", "LEVEL", "LEWIS", "LIGHT", "LIMIT",
-            "LOCAL", "LOGIC", "LOOSE", "LOWER", "LUCKY", "LUNCH", "MACRO", "MAGIC", "MAJOR", "MAKER",
-            "MARCH", "MATCH", "MAYOR", "MEANT", "MEDIA", "METAL", "MIGHT", "MINOR", "MINUS", "MIXED",
-            "MODEL", "MONEY", "MONTH", "MORAL", "MOTOR", "MOUNT", "MOUSE", "MOUTH", "MOVIE", "MUSIC",
-            "NEEDS", "NEVER", "NIGHT", "NOISE", "NORTH", "NOTED", "NOVEL", "NURSE", "OCCUR", "OCEAN",
-            "OFFER", "OFTEN", "ORDER", "OTHER", "OUGHT", "OUNCE", "OUTER", "OWNER", "PANEL", "PAPER",
-            "PARTY", "PEACE", "PETER", "PHASE", "PHONE", "PHOTO", "PIECE", "PILOT", "PITCH", "PLACE",
-            "PLAIN", "PLANE", "PLANT", "PLATE", "POINT", "POUND", "POWER", "PRESS", "PRICE", "PRIDE",
-            "PRIME", "PRINT", "PRIOR", "PRIZE", "PROOF", "PROUD", "PROVE", "QUEEN", "QUICK", "QUIET",
-            "QUITE", "RADIO", "RAISE", "RANGE", "RAPID", "RATIO", "REACH", "READY", "REFER", "RIGHT",
-            "RIVAL", "RIVER", "ROBIN", "ROGER", "ROMAN", "ROUGH", "ROUND", "ROUTE", "ROYAL", "RURAL",
-            "SCALE", "SCENE", "SCOPE", "SCORE", "SENSE", "SERVE", "SEVEN", "SHALL", "SHAPE", "SHARE",
-            "SHARP", "SHEET", "SHELF", "SHELL", "SHIFT", "SHIRT", "SHOCK", "SHOOT", "SHORT", "SHOWN",
-            "SIGHT", "SINCE", "SIXTH", "SIXTY", "SIZED", "SKILL", "SLEEP", "SLIDE", "SMALL", "SMART",
-            "SMILE", "SMITH", "SMOKE", "SOLID", "SOLVE", "SORRY", "SOUND", "SOUTH", "SPACE", "SPARE",
-            "SPEAK", "SPEED", "SPEND", "SPOKE", "SPORT", "STAFF", "STAGE", "STAND", "START", "STATE",
-            "STEAM", "STEEL", "STICK", "STILL", "STOCK", "STONE", "STORE", "STORM", "STORY", "STRIP",
-            "STUCK", "STUDY", "STUFF", "STYLE", "SUGAR", "SUITE", "SUPER", "SWEET", "TABLE", "TAKEN",
-            "TASTE", "TAXES", "TEACH", "TEETH", "TEXAS", "THANK", "THEFT", "THEIR", "THEME", "THERE",
-            "THESE", "THICK", "THING", "THINK", "THIRD", "THOSE", "THREE", "THREW", "THROW", "TIGHT",
-            "TIMES", "TIRED", "TITLE", "TODAY", "TOPIC", "TOTAL", "TOUCH", "TOUGH", "TOWER", "TRACK",
-            "TRADE", "TRAIN", "TREAT", "TREND", "TRIAL", "TRIBE", "TRICK", "TRUST", "TRUTH", "TWICE",
-            "UNDER", "UNDUE", "UNION", "UNITY", "UNTIL", "UPPER", "UPSET", "URBAN", "USAGE", "USUAL",
-            "VALID", "VALUE", "VIDEO", "VIRUS", "VISIT", "VISUAL", "VOICE", "WASTE", "WATCH", "WATER",
-            "WHEEL", "WHERE", "WHICH", "WHILE", "WHITE", "WHOLE", "WOMAN", "WORLD", "WORRY", "WORSE",
-            "WORST", "WORTH", "WOULD", "WOUND", "WRITE", "WRONG", "YOUTH"
-        ];
-        
-        // 创建允许的单词集合（谜底 + 常见词），提升查找速度
-        const ALLOWED_WORDS = new Set([...WORD_LIST, ...COMMON_VALID_GUESSES]);
         
         let availableWords = [...WORD_LIST];
         let currentWord = "";
@@ -543,12 +460,8 @@
             for (let c = 0; c < 5; c++) {
                 guess += document.getElementById(`tile-${currentRow}-${c}`).textContent;
             }
-
-            if (!ALLOWED_WORDS.has(guess)) {
-                showToast("Not in word list");
-                shakeRow();
-                return;
-            }
+            
+            // 移除了这里的词库限制验证，允许玩家随便输入内容猜测
             
             let targetLetters = {};
             for (let char of currentWord) {
