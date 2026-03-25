@@ -130,6 +130,18 @@
             100% { transform: rotateX(0); }
         }
 
+        /* Shake animation for invalid words */
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+
+        .row.shake {
+            animation: shake 0.4s;
+        }
+
         .keyboard-container {
             height: 200px;
             width: 100%;
@@ -221,6 +233,29 @@
         .btn-restart:hover {
             opacity: 0.8;
         }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--text-color);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            opacity: 1;
+            transition: opacity 0.4s ease-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -228,6 +263,8 @@
     <header>
         <h1>WORDLE</h1>
     </header>
+
+    <div class="toast-container" id="toast-container"></div>
 
     <div class="game-container">
         <div class="board-container">
@@ -284,15 +321,39 @@
     </div>
 
     <script>
+        // 更难的单词列表（作为游戏的谜底）
         const WORD_LIST = [
+            "ABYSS", "AGAPE", "ALOOF", "AMISS", "ASKEW", "AWARE", "AWFUL", "AZURE",
+            "BADGE", "BAKER", "BATHE", "BEZEL", "BLUFF", "BOULE", "BRAWL", "CACAO", 
+            "CATCH", "CAULK", "CHAFE", "CHASM", "COACH", "CRUMB", "CYNIC", "DECAL", 
+            "DIRGE", "DODGE", "DOWEL", "DWARF", "ECLAT", "ENNUI", "EPOCH", "FACET", 
+            "FEIGN", "FJORD", "FLAIL", "FLOCK", "FORGO", "GAFFE", "GLYPH", "GOUGE", 
+            "GRAZE", "GUILD", "HAUTE", "HEIST", "HOUND", "HUTCH", "IGLOO", "INERT", 
+            "IRATE", "IVORY", "JAUNT", "JAZZY", "JERKY", "JUMBO", "KAYAK", "KAZOO", 
+            "KNEAD", "KNOCK", "LAPEL", "LEMUR", "LILAC", "LUMEN", "MACAW", "MADAM", 
+            "MAUVE", "MIDGE", "MINCE", "MOCHA", "MOUND", "MUDDY", "NADIR", "NYMPH", 
+            "OASIS", "OBESE", "OCCUR", "ONION", "OVOID", "PIQUE", "PLUMB", "PROXY", 
+            "PULPY", "QUACK", "QUAIL", "QUASH", "QUIRK", "REBUT", "RHINO", "ROUGE", 
+            "RUPEE", "SALVO", "SAVOY", "SHIRK", "SHRUB", "SKULK", "SLAIN", "SLOSH", 
+            "SNOUT", "SQUID", "SWIRL", "SYNTH", "TAFFY", "TOPAZ", "TRACT", "TWANG", 
+            "UNCUT", "USURP", "UVULA", "VIGIL", "VOUCH", "WALTZ", "WHACK", "WHORL", 
+            "WIDOW", "WRUNG", "XENON", "YACHT", "YIELD", "ZESTY"
+        ];
+
+        // 常用有效五字母单词（用于凑成更庞大的合法检测字典，不限于谜底）
+        const COMMON_VALID_GUESSES = [
             "APPLE", "BRICK", "CRANE", "DANCE", "EAGLE", "FLAME", "GRAPE", "HOUSE", "IMAGE", "JUICE",
             "KNIFE", "LEMON", "MOUSE", "NIGHT", "OCEAN", "PEARL", "QUEEN", "RIVER", "SNAKE", "TRAIN",
             "UNCLE", "VOICE", "WATER", "YOUTH", "ZEBRA", "GHOST", "BLADE", "STORM", "PLANT", "HEART",
             "LIGHT", "MUSIC", "WORLD", "TIGER", "BEACH", "CHAIR", "CLOCK", "BREAD", "SMILE", "SUGAR",
             "REACT", "NOVEL", "MONEY", "VITAL", "SHAPE", "DREAM", "BRAVE", "MAGIC", "POWER", "SPACE",
             "TOWER", "STONE", "FRUIT", "PIZZA", "PAINT", "GLASS", "BLOOD", "BROWN", "BLACK", "WHITE",
-            "GREEN", "SWEET", "TRUCK", "MOUTH", "TOOTH", "SHIRT", "PANTS", "SHOES", "WATCH", "SMART"
+            "GREEN", "SWEET", "TRUCK", "MOUTH", "TOOTH", "SHIRT", "PANTS", "SHOES", "WATCH", "SMART",
+            "HELLO", "THERE", "WHERE", "WHICH", "THEIR", "ABOUT", "WOULD", "COULD", "RIGHT", "THINK"
         ];
+        
+        // 创建允许的单词集合（谜底 + 常见词），提升查找速度
+        const ALLOWED_WORDS = new Set([...WORD_LIST, ...COMMON_VALID_GUESSES]);
         
         let availableWords = [...WORD_LIST];
         let currentWord = "";
@@ -302,7 +363,21 @@
         
         const board = document.getElementById("board");
         const modal = document.getElementById("modal");
+        const toastContainer = document.getElementById("toast-container");
         
+        // 显示提示信息
+        function showToast(message) {
+            const toast = document.createElement("div");
+            toast.classList.add("toast");
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => toast.remove(), 400); // Wait for fade out
+            }, 1500);
+        }
+
         // Initialize Game
         function initGame() {
             // Prevent repeating words until pool is empty
@@ -389,6 +464,13 @@
             for (let c = 0; c < 5; c++) {
                 guess += document.getElementById(`tile-${currentRow}-${c}`).textContent;
             }
+
+            // 字典检测：判断是不是合法的英文单词
+            if (!ALLOWED_WORDS.has(guess)) {
+                showToast("Not in word list");
+                shakeRow();
+                return;
+            }
             
             // Build frequency map of target word to handle duplicate letters accurately
             let targetLetters = {};
@@ -461,11 +543,15 @@
         
         function shakeRow() {
             const row = document.getElementById(`row-${currentRow}`);
-            row.style.transform = "translateX(-5px)";
-            setTimeout(() => row.style.transform = "translateX(5px)", 50);
-            setTimeout(() => row.style.transform = "translateX(-5px)", 100);
-            setTimeout(() => row.style.transform = "translateX(5px)", 150);
-            setTimeout(() => row.style.transform = "translateX(0)", 200);
+            row.classList.remove("shake");
+            // Trigger reflow to restart animation
+            void row.offsetWidth;
+            row.classList.add("shake");
+            
+            // Remove the class after animation completes
+            setTimeout(() => {
+                row.classList.remove("shake");
+            }, 400);
         }
         
         function endGame(win) {
